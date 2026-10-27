@@ -14,9 +14,17 @@ public class Movie {
         this.year = year;
     }
 
-    public long getId() { return id; }
-    public String getTitle() { return title; }
-    public int getYear() { return year; }
+    public long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int getYear() {
+        return year;
+    }
 
     @Override
     public boolean equals(Object o) {
