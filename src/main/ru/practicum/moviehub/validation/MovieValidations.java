@@ -6,7 +6,8 @@ import java.util.List;
 
 public final class MovieValidations {
 
-    private MovieValidations() {}
+    private MovieValidations() {
+    }
 
     public static List<String> validate(String title, int year) {
         List<String> errors = new ArrayList<>();
