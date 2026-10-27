@@ -1,60 +1,63 @@
 package ru.practicum.moviehub.http;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import ru.practicum.moviehub.model.Movie;
 import ru.practicum.moviehub.store.MoviesStore;
 
-public class MoviesStoreTest {
+import java.util.List;
 
-    private static MoviesStore store;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class MoviesStoreTest {
+    private MoviesStore store;
 
     @BeforeEach
-    void beforeEach() {
+    public void beforeEach() {
         store = new MoviesStore();
     }
-    
+
     @Test
     public void getMovies_whenEmpty_returnsEmptyList() {
-        List<Movie> movies = store.getMovies();
-        assertTrue(movies.isEmpty(), "Список фильмов должен быть пустым");
+        assertTrue(store.getMovies().isEmpty());
     }
 
     @Test
     public void getMovies_whenNotEmpty_returnsMoviesList() {
-        Movie movie = new Movie("Star Wars: Episode I - The Phantom Menace", 1999);
-        store.add(movie);
-        List<Movie> movies = store.getMovies();
-        assertFalse(movies.isEmpty(), "Список фильмов не должен быть пустым");
+        Movie movie = store.add("Кино", 1999);
+        assertEquals(List.of(movie), store.getMovies());
+        assertEquals(movie, store.get(movie.getId()));
     }
 
     @Test
     public void clearMovies_whenEmptied_returnsEmptyList() {
-        Movie movie = new Movie("Star Wars: Episode I - The Phantom Menace", 1999);
-        Movie movie2 = new Movie("Star Wars: Episode II - Attack of the Clones", 2002);
-        store.add(movie);
-        store.add(movie2);
-        assertTrue(store.getMovies().size() == 2, "В сторе должно находиться 2 фильма");
+        Movie first = store.add("Первый", 1999);
+        store.add("Второй", 2000);
         store.clear();
-        assertTrue(store.getMovies().isEmpty(), "В сторе не должно быть фильмов");
+        assertTrue(store.getMovies().isEmpty());
+        assertNull(store.get(first.getId()));
     }
 
     @Test
-    public void restrictDups_whenAddDup_throwsException() {
-        Movie movie = new Movie("Star Wars: Episode I - The Phantom Menace", 1999);
-        Movie movie2 = new Movie("Star Wars: Episode I - The Phantom Menace", 1999);
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> {
-            store.add(movie);
-            store.add(movie2);
-        });
-        assertEquals("Такое кино уже существует", e.getMessage());
+    public void remove_whenMovieExists_deletesOnlyRequestedMovie() {
+        Movie first = store.add("Первый", 1999);
+        Movie second = store.add("Второй", 2000);
+        assertTrue(store.remove(first.getId()));
+        assertNull(store.get(first.getId()));
+        assertFalse(store.remove(first.getId()));
+        assertEquals(List.of(second), store.getMovies());
     }
+
+    @Test
+    public void getMoviesByYear_whenYearGiven_returnsOnlyMatchingMovies() {
+        Movie first = store.add("Первый", 1999);
+        Movie second = store.add("Второй", 1999);
+        store.add("Третий", 2000);
+        List<Movie> movies = store.getMoviesByYear(1999);
+        assertEquals(2, movies.size());
+        assertTrue(movies.containsAll(List.of(first, second)));
+        assertTrue(store.getMoviesByYear(2001).isEmpty());
+        assertEquals(3, store.getMovies().size());
+    }
+
 }

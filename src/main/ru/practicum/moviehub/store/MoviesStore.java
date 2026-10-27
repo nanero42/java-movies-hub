@@ -3,34 +3,44 @@ package ru.practicum.moviehub.store;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import ru.practicum.moviehub.model.Movie;
 
 public class MoviesStore {
 
-    private final HashMap<UUID, Movie> movies;
+    private final HashMap<Long, Movie> movies;
+    private long nextId = 1;
 
     public MoviesStore() {
         movies = new HashMap<>();
     }
 
     public List<Movie> getMovies() {
-        return new ArrayList<>(movies.values());
+        List<Movie> moviesList = new ArrayList<>(movies.values());
+        return moviesList.subList(0, Math.min(moviesList.size(), 10));
+    }
+
+    public List<Movie> getMoviesByYear(int year) {
+        return movies.values().stream()
+            .filter(movie -> movie.getYear() == year)
+            .toList();
+    }
+
+    public Movie get(long id) {
+        return movies.get(id);
+    }
+
+    public boolean remove(long id) {
+        return movies.remove(id) != null;
     }
 
     public void clear() {
         movies.clear();
     }
 
-    public void add(Movie movie) {
-        boolean has = movies.values().stream()
-            .anyMatch(m -> {
-                boolean isTitlesEqual = m.getTitle().equalsIgnoreCase(movie.getTitle());
-                boolean isYearEqual = m.getYear() == movie.getYear();
-                return isTitlesEqual && isYearEqual;
-            });
-        if (has) throw new IllegalArgumentException("Такое кино уже существует");
+    public Movie add(String title, int year) {
+        Movie movie = new Movie(nextId++, title, year);
         movies.put(movie.getId(), movie);
+        return movie;
     }
 }

@@ -14,7 +14,7 @@ public class MoviesServer {
 
     public MoviesServer(MoviesStore moviesStore, int i) {
         try {
-            store = new MoviesStore();
+            store = moviesStore;
             server = HttpServer.create(new InetSocketAddress(i), 0);
             server.createContext("/", new MoviesHttpHandler(store));
         } catch (IOException e) {
