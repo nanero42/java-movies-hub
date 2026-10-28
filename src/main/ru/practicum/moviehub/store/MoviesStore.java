@@ -16,8 +16,7 @@ public class MoviesStore {
     }
 
     public List<Movie> getMovies() {
-        List<Movie> moviesList = new ArrayList<>(movies.values());
-        return moviesList.subList(0, Math.min(moviesList.size(), 10));
+        return new ArrayList<>(movies.values());
     }
 
     public List<Movie> getMoviesByYear(int year) {
@@ -36,6 +35,7 @@ public class MoviesStore {
 
     public void clear() {
         movies.clear();
+        nextId = 1;
     }
 
     public Movie add(String title, int year) {

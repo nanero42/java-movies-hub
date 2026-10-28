@@ -69,8 +69,12 @@ public class MoviesHttpHandler extends BaseHttpHandler {
         }
         long id;
         try {
-            id = Math.abs(Long.parseLong(rawId));
+            id = Long.parseLong(rawId);
         } catch (NumberFormatException e) {
+            sendError(exchange, 400, "Некорректный ID");
+            return;
+        }
+        if (id <= 0) {
             sendError(exchange, 400, "Некорректный ID");
             return;
         }
